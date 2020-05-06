@@ -6,7 +6,7 @@
 import java.io.File;
 import java.util.*;
 
-public class lab2 {
+public class lab3 {
     // holds each line of the program
     private static ArrayList<String> lines = new ArrayList<>();
     // each label is stored in here at the index of the # instruction it comes after
@@ -496,9 +496,32 @@ public class lab2 {
 
     public static void main(String[] args) throws Exception
     {
+        Scanner scan = new Scanner(System.in);
+        String input = "";
+
         //readFile(args[0]);
-        readFile("test1.asm");
-        printMemory();
+        if(args.length > 1)
+        {
+            //script mode
+        }
+        else
+        {
+            //interactive mode
+            while(true){
+                System.out.print("mips> ");
+                input = scan.nextLine();
+                if(input.equals("q"))
+                {
+                    break;
+                }
+                else if(input.equals("d"))
+                {
+                    printMemory();
+                }
+            }
+        }
+        //readFile("test1.asm");
+        //printMemory();
         //findLabels();
         //printInstruction();
     }
