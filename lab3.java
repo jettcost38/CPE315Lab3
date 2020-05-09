@@ -74,6 +74,15 @@ public class lab3 {
         }
     }
 
+    private static void clearMemory()
+    {
+        for(Register r: codes)
+        {
+            if(!r.name.equals("zero"))
+                r.val = 0;
+        }
+    }
+
     // Reads the file and puts each line into the ArrayList lines
     public static void readFile(String file) throws Exception
     {
@@ -509,14 +518,41 @@ public class lab3 {
             //interactive mode
             while(true){
                 System.out.print("mips> ");
-                input = scan.nextLine();
-                if(input.equals("q"))
+                user = scan.nextLine();
+                String[] input = user.split(" ");
+                if(input[0].equals("q"))
                 {
                     break;
                 }
-                else if(input.equals("d"))
+                else if(input[0].equals("d"))
                 {
                     printMemory();
+                }
+                else if(input[0].equals("c")) {
+                    clearMemory();
+                    System.out.print("      Simulator reset\n");
+                }
+                else if(input[0].equals("s"))
+                {
+
+                }
+                else if(input[0].equals("r"))
+                {
+
+                }
+                else if(input[0].equals("m"))
+                {
+
+                }
+                else if(input[0].equals("h"))
+                {
+                    System.out.print("h = show help\n");
+                    System.out.print("d = dump register state\n");
+                    System.out.print("s = single step through the program (i.e. execute 1 instruction and stop)\n");
+                    System.out.print("s num = step through num instructions of the program\n");
+                    System.out.print("r = run until the program ends\n");
+                    System.out.print("m num1 num2 = display data memory from location num1 to num2 c = clear all registers, memory, and the program counter to 0\n");
+                    System.out.print("q = exit the program\n");
                 }
             }
         }
