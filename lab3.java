@@ -211,94 +211,94 @@ public class lab3 {
                 else if(tokens[j].equals("and"))
                 {
                     inst_num++;
-                    System.out.print("000000 ");
+                    //System.out.print("000000 ");
                     // This takes only the arguments of the instruction
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 00000 100100");
+                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "and");
+                    //System.out.println(" 00000 100100");
                 }
                 else if(tokens[j].equals("or"))
                 {
                     inst_num++;
-                    System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 00000 100101");
+                    //System.out.print("000000 ");
+                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "or");
+                    //System.out.println(" 00000 100101");
                 }
                 else if(tokens[j].equals("add"))
                 {
                     inst_num++;
-                    System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 00000 100000");
+                    //System.out.print("000000 ");
+                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "add");
+                    //System.out.println(" 00000 100000");
                 }
                 else if(tokens[j].equals("addi"))
                 {
                     inst_num++;
-                    System.out.print("001000 ");
+                    //System.out.print("001000 ");
                     addi(Arrays.copyOfRange(tokens, j + 1, tokens.length));
                 }
                 else if(tokens[j].equals("sll"))
                 {
                     inst_num++;
-                    System.out.print("000000 00000 ");
+                    //System.out.print("000000 00000 ");
                     sll(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 000000");
+                    //System.out.println(" 000000");
                 }
                 else if(tokens[j].equals("sub"))
                 {
                     inst_num++;
-                    System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 00000 100010");
+                    //System.out.print("000000 ");
+                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sub");
+                    //System.out.println(" 00000 100010");
                 }
                 else if(tokens[j].equals("slt"))
                 {
                     inst_num++;
-                    System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 00000 101010");
+                    //System.out.print("000000 ");
+                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "slt");
+                    //System.out.println(" 00000 101010");
                 }
                 else if(tokens[j].equals("beq"))
                 {
                     inst_num++;
-                    System.out.print("000100 ");
-                    b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length));
+                    //System.out.print("000100 ");
+                    b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "beq");
                 }
                 else if(tokens[j].equals("bne"))
                 {
                     inst_num++;
-                    System.out.print("000101 ");
-                    b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length));
+                    //System.out.print("000101 ");
+                    b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "bne");
                 }
                 else if(tokens[j].equals("lw"))
                 {
                     inst_num++;
-                    System.out.print("100011 ");
-                    loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length));
+                    //System.out.print("100011 ");
+                    loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "lw");
                 }
                 else if(tokens[j].equals("sw"))
                 {
                     inst_num++;
-                    System.out.print("101011 ");
-                    loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length));
+                    //System.out.print("101011 ");
+                    loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sw");
                 }
                 else if(tokens[j].equals("j"))
                 {
                     inst_num++;
-                    System.out.print("000010 ");
-                    j(tokens[j + 1]);
+                    //System.out.print("000010 ");
+                    j(tokens[j + 1], 'j');
                 }
                 else if(tokens[j].equals("jr"))
                 {
                     inst_num++;
-                    System.out.print("000000 ");
+                    //System.out.print("000000 ");
                     jr(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    System.out.println(" 000000000000000 001000");
+                    //System.out.println(" 000000000000000 001000");
                 }
                 else if(tokens[j].equals("jal"))
                 {
                     inst_num++;
-                    System.out.print("000011 ");
-                    j(tokens[j + 1]);
+                    //System.out.print("000011 ");
+                    j(tokens[j + 1], "jal");
                 }
                 // If it is not an instruction, it could possibly be another recognized thing or an invalid instruction.
                 // Error checking.
@@ -344,33 +344,60 @@ public class lab3 {
     }
 
     // R-format. Used for and, or, add, sub, slt
-    public static void r(String[] tokens)
+    public static void r(String[] tokens, String cmnd)
     {
         // The array contains some blank elements, so this removes them
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        String rs = "";
-        String rt = "";
-        String rd = "";
+        int rs = 0;
+        int rt = 0;
+        int rd = 0;
 
         // Search for the registers' codes in the register list
         for(Register r: codes)
         {
             if(r.name.equals(t.get(1)))
             {
-                rs = r.code;
+                rs = r.val;
             }
             if(r.name.equals(t.get(2)))
             {
-                rt = r.code;
+                rt = r.val;
             }
-            if(r.name.equals(t.get(0)))
-            {
-                rd = r.code;
+        }
+        //System.out.print(rs + " " + rt + " " + rd);
+        if(cmnd == "and"){
+            rd = (rs & rt);
+        }
+
+        else if(cmnd == "or"){
+            rd = (rs | rt);
+        }
+
+        else if(cmnd == "add"){
+            rd = (rs + rt);
+        }
+
+        else if(cmnd == "sub"){
+            rd = (rs - rt);
+        }
+
+        else if(cmnd == "slt"){
+            if(rs < rt){
+                rd = 1
+            }
+            else if (rs >= rt){
+                rd = 0;
             }
         }
 
-        System.out.print(rs + " " + rt + " " + rd);
+        for(Register r: codes)
+        {
+            if(r.name.equals(t.get(0)))
+            {
+                r.val = rd;
+            }
+        }
     }
 
     // Used for sll
@@ -378,53 +405,65 @@ public class lab3 {
     {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        String rt = "";
-        String rd = "";
+        int rt = 0;
+        int rd = 0;
+        int numShift = Integer.parseInt(t.get(2));
 
         for(Register r: codes)
         {
             if(r.name.equals(t.get(1)))
             {
-                rt = r.code;
-            }
-            if(r.name.equals(t.get(0)))
-            {
-                rd = r.code;
+                rt = r.val;
             }
         }
 
-        System.out.print(rt + " " + rd + " " + String.format("%05d", Integer.parseInt(Integer.toBinaryString(Integer.parseInt(t.get(2))))));
+        //System.out.print(rt + " " + rd + " " + String.format("%05d", Integer.parseInt(Integer.toBinaryString(Integer.parseInt(t.get(2))))));
+        rd = rt << numShift;   // left shift operation numShift times
+
+        for(Register r: codes)
+        {
+            if(r.name.equals(t.get(0)))
+            {
+                r.val = rd;
+            }
+        }
     }
 
     // Used for addi
     public static void addi(String[] tokens) {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        String rt = "";
-        String rs = "";
+        int rt = 0;
+        int rs = 0;
+        int immediate = Integer.parseInt(t.get(2));
 
         for (Register r : codes) {
-            if (r.name.equals(t.get(0))) {
-                rt = r.code;
-            }
             if (r.name.equals(t.get(1))) {
-                rs = r.code;
+                rs = r.val;
             }
         }
         // Had to do an if/else here to ensure the immediate is printed out as a 16 bit number
-        if (Integer.parseInt(t.get(2)) < 0)
+        /*if (Integer.parseInt(t.get(2)) < 0)
         {
             short a = (short) Integer.parseInt(t.get(2));
-            System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
+            //System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
         }
         else
         {
-            System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString(Integer.parseInt(t.get(2))))));
+            //System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString(Integer.parseInt(t.get(2))))));
+        }*/
+
+        rt = rs + immediate;
+
+        for (Register r : codes) {
+            if (r.name.equals(t.get(0))) {
+                r.val = rt;
+            }
         }
     }
 
     // Branching instructions. Used for beq, bne
-    public static void b(int inst, String[] tokens) {
+    public static void b(int inst, String[] tokens, String cmnd) {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
         String rt = "";
@@ -450,16 +489,16 @@ public class lab3 {
         if ((label_pos - inst) < 0)
         {
             short a = (short) (label_pos - inst);
-            System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
+            //System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
         }
         else
         {
-            System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString((label_pos - inst)))));
+            //System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString((label_pos - inst)))));
         }
     }
 
     // J-format. Used for j, jal
-    public static void j(String target)
+    public static void j(String target, String cmnd)
     {
         int label_pos = 0;
         //search for the label
@@ -472,7 +511,7 @@ public class lab3 {
         }
 
         short a = (short) label_pos;
-        System.out.println(String.format("%026d", Integer.parseInt(Integer.toBinaryString(a))));
+        //System.out.println(String.format("%026d", Integer.parseInt(Integer.toBinaryString(a))));
     }
 
     // Used for jr
@@ -484,13 +523,13 @@ public class lab3 {
         {
             if(r.name.equals(t.get(0)))
             {
-                System.out.print(r.code);
+                //System.out.print(r.code);
             }
         }
     }
 
     // Load/Store instructions. Used for lw, sw
-    public static void loadStore(String[] tokens)
+    public static void loadStore(String[] tokens, String cmnd)
     {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
