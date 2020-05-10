@@ -174,6 +174,10 @@ public class lab3 {
                 // Here is where it puts the label into the array
                 else if(tokens[j].contains(":")) {
                     labels[num_inst] = tokens[j].substring(0, tokens[j].length() - 1);
+                    if(j == tokens.length - 1)
+                    {
+                        linesToRemove.add(l);
+                    }
                 }
                 else if (j == tokens.length - 1)
                 {
@@ -520,7 +524,7 @@ public class lab3 {
         ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
 
         //readFile(args[0]);
-        readFile("test1.asm");
+        readFile("test2.asm");
         //printMemory();
         findLabels();
         //parseInstructions();
