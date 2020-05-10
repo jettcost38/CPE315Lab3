@@ -508,6 +508,7 @@ public class lab3 {
         public ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
 
         Scanner scan = new Scanner(System.in);
+
         String user = "";
 
         //readFile(args[0]);
@@ -602,7 +603,7 @@ public class lab3 {
             while(true){
 
                 System.out.print("mips> ");
-                user = scan.nextLine();
+                String user = scan.nextLine();
                 String[] input = user.split(" ");
 
                 if(input[0].equals("q"))
@@ -622,7 +623,7 @@ public class lab3 {
 
                 else if(input[0].equals("s"))
                 {
-                    if(input[1] == null){
+                    if(input.length == 1){
                         // single step
                         System.out.print("      1 instruction(s) executed\n");
                     }
@@ -645,7 +646,9 @@ public class lab3 {
                     int num1 = Integer.parseInt(input[1]);
                     int num2 = Integer.parseInt(input[2]);
                     for(int j = num1; j < (num2+1); j++){
-                        System.out.println(String.format("[%d] = ", j) + codes[j].val + "\n");
+
+                        System.out.println(String.format("[%d] = ", j) + codes.get(j).val);
+
                     }
                 }
 
