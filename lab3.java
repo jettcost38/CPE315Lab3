@@ -506,7 +506,6 @@ public class lab3 {
     public static void main(String[] args) throws Exception
     {
         Scanner scan = new Scanner(System.in);
-        String input = "";
 
         //readFile(args[0]);
         if(args.length > 1)
@@ -519,7 +518,7 @@ public class lab3 {
             while(true){
 
                 System.out.print("mips> ");
-                user = scan.nextLine();
+                String user = scan.nextLine();
                 String[] input = user.split(" ");
 
                 if(input[0].equals("q"))
@@ -539,7 +538,7 @@ public class lab3 {
 
                 else if(input[0].equals("s"))
                 {
-                    if(input[1] == null){
+                    if(input.length == 1){
                         // single step
                         System.out.print("      1 instruction(s) executed\n");
                     }
@@ -561,7 +560,7 @@ public class lab3 {
                     int num1 = Integer.parseInt(input[1]);
                     int num2 = Integer.parseInt(input[2]);
                     for(int j = num1; j < (num2+1); j++){
-                        System.out.println(String.format("[%d] = ", j) + codes[j].val);
+                        System.out.println(String.format("[%d] = ", j) + codes.get(j).val);
                     }
                 }
 
