@@ -574,7 +574,7 @@ public class lab3 {
                     int num1 = Integer.parseInt(input[1]);
                     int num2 = Integer.parseInt(input[2]);
                     for(int j = num1; j < (num2+1); j++){
-                        System.out.println(String.format("[%d] = ", j) + codes[j].val + "\n");
+                        System.out.println(String.format("[%d] = ", j) + codes.get(j).val);
                     }
                 }
 
