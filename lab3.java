@@ -505,14 +505,97 @@ public class lab3 {
 
     public static void main(String[] args) throws Exception
     {
+        public ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
+
         Scanner scan = new Scanner(System.in);
-        String input = "";
+        String user = "";
 
         //readFile(args[0]);
         if(args.length > 1)
         {
             //script mode
+            String command;
+            File in = new File(args[1]);
+            command = scan.nextLine();     // reading commands into its own array
+            while(command != null)
+            {
+                commands.add(command);
+                try
+                {
+                    command = scan.nextLine();
+                }
+                catch (NoSuchElementException e)
+                {
+                    break;
+                }
+            }
+
+            for(int i = 0; i < commands.length; i++){
+                String[] input = commands[i].split(" ");  // command line -> [[command], [num1], [num2], ...)
+
+                if(input[0].equals("q"))
+                {
+                    break;
+                }
+
+                else if(input[0].equals("d"))
+                {
+                    printMemory();
+                }
+
+                else if(input[0].equals("c")) {
+                    clearMemory();
+                    System.out.print("      Simulator reset\n");
+                }
+
+                else if(input[0].equals("s"))
+                {
+                    if(input[1] == null){
+                        // single step
+                        System.out.print("      1 instruction(s) executed\n");
+                    }
+                    else{
+                        int num = Integer.parseInt(input[1]);
+                        for(int i = 0; i < num; i++){
+                            // single step
+                        }
+                        System.out.print(String.format("      %d instruction(s) executed\n", num));
+                    }
+                }
+
+                else if(input[0].equals("r"))
+                {
+                    // run through entire program
+                }
+
+                else if(input[0].equals("m"))
+                {
+                    int num1 = Integer.parseInt(input[1]);
+                    int num2 = Integer.parseInt(input[2]);
+                    for(int j = num1; j < (num2+1); j++){
+                        System.out.println(String.format("[%d] = ", j) + codes[j].val + "\n");
+                    }
+                }
+
+                else if(input[0].equals("h"))
+                {
+                    System.out.print("h = show help\n");
+                    System.out.print("d = dump register state\n");
+                    System.out.print("s = single step through the program (i.e. execute 1 instruction and stop)\n");
+                    System.out.print("s num = step through num instructions of the program\n");
+                    System.out.print("r = run until the program ends\n");
+                    System.out.print("m num1 num2 = display data memory from location num1 to num2 \n");
+                    System.out.print("c = clear all registers, memory, and the program counter to 0\n");
+                    System.out.print("q = exit the program\n");
+                }
+
+                else
+                {
+                    continue;
+                }
+            }
         }
+
         else
         {
             //interactive mode
@@ -548,6 +631,7 @@ public class lab3 {
                         for(int i = 0; i < num; i++){
                             // single step
                         }
+                        System.out.print(String.format("      %d instruction(s) executed\n", num));
                     }
                 }
 
@@ -561,7 +645,7 @@ public class lab3 {
                     int num1 = Integer.parseInt(input[1]);
                     int num2 = Integer.parseInt(input[2]);
                     for(int j = num1; j < (num2+1); j++){
-                        System.out.println(String.format("[%d] = ", j) + codes[j].val);
+                        System.out.println(String.format("[%d] = ", j) + codes[j].val + "\n");
                     }
                 }
 
