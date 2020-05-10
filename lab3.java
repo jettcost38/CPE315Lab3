@@ -13,8 +13,6 @@ public class lab3 {
     private static String[] labels;
     // number of instructions. Used for putting labels into labels[]
     private static int num_inst = 0;
-    // used to keep track of which instruction we're on
-    private static int inst_num = 0;
 
     private static Stack<Integer> memory = new Stack<>();
 
@@ -68,14 +66,21 @@ public class lab3 {
         }
     };
 
-    // TODO: Format this correctly
     private static void printMemory()
     {
-        for(Register r: codes)
+        System.out.println("$pc = " + codes.get(0).val);
+        int l = 0;
+        for(int i = 0; i < codes.size() - 2; i++)
         {
-            if(!r.name.equals("zero"))
-                System.out.println("$" + r.name + " = " + r.val);
+            System.out.print("$" + codes.get(i + 2).name + " = " + codes.get(i + 2).val + "\t\t");
+            l++;
+            if(l == 4)
+            {
+                System.out.println();
+                l = 0;
+            }
         }
+        System.out.println();
     }
 
     private static void clearMemory()
@@ -86,6 +91,12 @@ public class lab3 {
                 r.val = 0;
         }
         memory.clear();
+
+        for(int i = 0; i < 4095; i++)
+        {
+            memory.push(0);
+        }
+        codes.get(0).val = 0;
     }
 
     // Reads the file and puts each line into the ArrayList lines
@@ -94,6 +105,11 @@ public class lab3 {
         String line;
         File in = new File(file);
         Scanner scan = new Scanner(in);
+
+        for(int i = 0; i < 4095; i++)
+        {
+            memory.push(0);
+        }
 
         line = scan.nextLine();
         while(line != null)
@@ -198,7 +214,7 @@ public class lab3 {
     public static void parseInstruction()
     {
         // Contains each part of the line as an array
-        String[] tokens = lines.get(inst_num).split(" |\t|\\$|,|:|\\(|\\)");
+        String[] tokens = lines.get(codes.get(0).val).split(" |\t|\\$|,|:|\\(|\\)");
         for(int j = 0; j < tokens.length; j++)
         {
             // We don't need to see anything in comments
@@ -208,94 +224,73 @@ public class lab3 {
             }
             else if(tokens[j].equals("and"))
             {
-                inst_num++;
-                //System.out.print("000000 ");
-                // This takes only the arguments of the instruction
+                codes.get(0).val++;
                 r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "and");
-                //System.out.println(" 00000 100100");
             }
             else if(tokens[j].equals("or"))
             {
-                inst_num++;
-                //System.out.print("000000 ");
+                codes.get(0).val++;
                 r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "or");
-                //System.out.println(" 00000 100101");
             }
             else if(tokens[j].equals("add"))
             {
-                inst_num++;
-                //System.out.print("000000 ");
+                codes.get(0).val++;
                 r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "add");
-                //System.out.println(" 00000 100000");
             }
             else if(tokens[j].equals("addi"))
             {
-                inst_num++;
-                //System.out.print("001000 ");
+                codes.get(0).val++;
                 addi(Arrays.copyOfRange(tokens, j + 1, tokens.length));
             }
             else if(tokens[j].equals("sll"))
             {
-                inst_num++;
-                //System.out.print("000000 00000 ");
+                codes.get(0).val++;
                 sll(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                //System.out.println(" 000000");
             }
             else if(tokens[j].equals("sub"))
             {
-                inst_num++;
-                //System.out.print("000000 ");
+                codes.get(0).val++;
                 r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sub");
-                //System.out.println(" 00000 100010");
             }
             else if(tokens[j].equals("slt"))
             {
-                inst_num++;
-                //System.out.print("000000 ");
+                codes.get(0).val++;
                 r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "slt");
-                //System.out.println(" 00000 101010");
             }
             else if(tokens[j].equals("beq"))
             {
-                inst_num++;
-                //System.out.print("000100 ");
-                b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "beq");
+                codes.get(0).val++;
+                b(codes.get(0).val, Arrays.copyOfRange(tokens, j + 1, tokens.length), "beq");
             }
             else if(tokens[j].equals("bne"))
             {
-                inst_num++;
-                //System.out.print("000101 ");
-                b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "bne");
+                codes.get(0).val++;
+                b(codes.get(0).val, Arrays.copyOfRange(tokens, j + 1, tokens.length), "bne");
             }
             else if(tokens[j].equals("lw"))
             {
-                inst_num++;
-                //System.out.print("100011 ");
+                codes.get(0).val++;
                 loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "lw");
             }
             else if(tokens[j].equals("sw"))
             {
-                inst_num++;
-                //System.out.print("101011 ");
+                codes.get(0).val++;
                 loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sw");
             }
             else if(tokens[j].equals("j"))
             {
-                inst_num++;
-                //System.out.print("000010 ");
                 j(tokens[j + 1], "j");
+                codes.get(0).val++;
             }
             else if(tokens[j].equals("jr"))
             {
-                inst_num++;
-                //System.out.print("000000 ");
+                codes.get(0).val++;
                 jr(Arrays.copyOfRange(tokens, j + 1, tokens.length));
                 //System.out.println(" 000000000000000 001000");
             }
             else if(tokens[j].equals("jal"))
             {
-                inst_num++;
-                //System.out.print("000011 ");
+                codes.get(0).val++;
                 j(tokens[j + 1], "jal");
             }
             // If it is not an instruction, it could possibly be another recognized thing or an invalid instruction.
@@ -447,16 +442,6 @@ public class lab3 {
                 rs = r.val;
             }
         }
-        // Had to do an if/else here to ensure the immediate is printed out as a 16 bit number
-        /*if (Integer.parseInt(t.get(2)) < 0)
-        {
-            short a = (short) Integer.parseInt(t.get(2));
-            //System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
-        }
-        else
-        {
-            //System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString(Integer.parseInt(t.get(2))))));
-        }*/
 
         rt = rs + immediate;
 
@@ -471,15 +456,15 @@ public class lab3 {
     public static void b(int inst, String[] tokens, String cmnd) {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        String rt = "";
-        String rs = "";
+        int rt = 0;
+        int rs = 0;
 
         for (Register r : codes) {
             if (r.name.equals(t.get(1))) {
-                rt = r.code;
+                rt = r.val;
             }
             if (r.name.equals(t.get(0))) {
-                rs = r.code;
+                rs = r.val;
             }
         }
         int label_pos = 0;
@@ -491,14 +476,19 @@ public class lab3 {
                 label_pos = i;
             }
         }
-        if ((label_pos - inst) < 0)
+        if(cmnd.equals("beq"))
         {
-            short a = (short) (label_pos - inst);
-            //System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
+            if(rt == rs)
+            {
+                codes.get(0).val = label_pos;
+            }
         }
         else
         {
-            //System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString((label_pos - inst)))));
+            if(rt != rs)
+            {
+                codes.get(0).val = label_pos;
+            }
         }
     }
 
@@ -514,9 +504,15 @@ public class lab3 {
                 label_pos = i;
             }
         }
-
-        short a = (short) label_pos;
-        //System.out.println(String.format("%026d", Integer.parseInt(Integer.toBinaryString(a))));
+        if(cmnd.equals("jal"))
+        {
+            codes.get(codes.size() - 1).val = codes.get(0).val;
+            codes.get(0).val = label_pos;
+        }
+        else if(cmnd.equals("j"))
+        {
+            codes.get(0).val = label_pos - 1;
+        }
     }
 
     // Used for jr
@@ -528,7 +524,7 @@ public class lab3 {
         {
             if(r.name.equals(t.get(0)))
             {
-                //System.out.print(r.code);
+                codes.get(0).val = r.val;
             }
         }
     }
@@ -538,27 +534,33 @@ public class lab3 {
     {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        String rt = "";
-        String rs = "";
+        int rs = 0;
         for(Register r: codes)
         {
-            if(r.name.equals(t.get(0)))
-            {
-                rt = r.code;
-            }
             if(r.name.equals(t.get(2)))
             {
-                rs = r.code;
+                rs = r.val;
             }
         }
-        if(Integer.parseInt(t.get(1)) < 0)
+        if(cmnd.equals("lw"))
         {
-            short a = (short) Integer.parseInt(t.get(1));
-            System.out.println(rs + " " + rt + " " + Integer.toBinaryString(0xFFFF & a));
+            for(Register r: codes)
+            {
+                if(r.name.equals(t.get(0)))
+                {
+                    r.val = memory.get(rs + Integer.parseInt(t.get(1)));
+                }
+            }
         }
         else
         {
-            System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString(Integer.parseInt(t.get(1))))));
+            for(Register r: codes)
+            {
+                if(r.name.equals(t.get(0)))
+                {
+                    memory.set(rs + Integer.parseInt(t.get(1)), r.val);
+                }
+            }
         }
     }
 
@@ -567,8 +569,7 @@ public class lab3 {
         Scanner scan = new Scanner(System.in);
         ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
 
-        //readFile(args[0]);
-        readFile("test5.asm");
+        readFile(args[0]);
         //printMemory();
         findLabels();
         //parseInstruction();
@@ -612,7 +613,7 @@ public class lab3 {
                 else if(input[0].equals("s"))
                 {
                     if(input[1] == null){
-                        if(inst_num < lines.size())
+                        if(codes.get(0).val < lines.size())
                         {
                             parseInstruction();
                             System.out.print("      1 instruction(s) executed\n");
@@ -629,7 +630,10 @@ public class lab3 {
 
                 else if(input[0].equals("r"))
                 {
-                    // run through entire program
+                    while(codes.get(0).val < num_inst)
+                    {
+                        parseInstruction();
+                    }
                 }
 
                 else if(input[0].equals("m"))
@@ -637,7 +641,7 @@ public class lab3 {
                     int num1 = Integer.parseInt(input[1]);
                     int num2 = Integer.parseInt(input[2]);
                     for(int j = num1; j < (num2+1); j++){
-                        System.out.println(String.format("[%d] = ", j) + codes.get(j).val);
+                        System.out.println(String.format("[%d] = ", j) + memory.get(j));
                     }
                 }
 
@@ -687,7 +691,7 @@ public class lab3 {
                 else if(input[0].equals("s"))
                 {
                     if(input.length == 1){
-                        if(inst_num < lines.size())
+                        if(codes.get(0).val < lines.size())
                         {
                             parseInstruction();
                             System.out.print("      1 instruction(s) executed\n");
@@ -704,7 +708,10 @@ public class lab3 {
 
                 else if(input[0].equals("r"))
                 {
-                    // run through entire program
+                    while(codes.get(0).val < num_inst)
+                    {
+                        parseInstruction();
+                    }
                 }
 
                 else if(input[0].equals("m"))
@@ -713,7 +720,7 @@ public class lab3 {
                     int num2 = Integer.parseInt(input[2]);
                     for(int j = num1; j < (num2+1); j++){
 
-                        System.out.println(String.format("[%d] = ", j) + codes.get(j).val);
+                        System.out.println(String.format("[%d] = ", j) + memory.get(j));
 
                     }
                 }
