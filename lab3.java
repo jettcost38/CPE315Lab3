@@ -14,6 +14,8 @@ public class lab3 {
     // number of instructions. Used for putting labels into labels[]
     private static int num_inst = 0;
 
+    private static Stack<Integer> memory = new Stack<>();
+
     // A class solely to make finding the register code easier
     public static class Register
     {
@@ -81,6 +83,7 @@ public class lab3 {
             if(!r.name.equals("zero"))
                 r.val = 0;
         }
+        memory.clear();
     }
 
     // Reads the file and puts each line into the ArrayList lines
@@ -337,6 +340,14 @@ public class lab3 {
                     {
                         System.out.println("invalid instruction: " + tokens[j]);
                         return;
+                    }
+                }
+                //modify the stack if needed
+                if(codes.get(codes.size() - 2).val > memory.size())
+                {
+                    while(memory.size() < codes.get(codes.size() - 2).val)
+                    {
+                        memory.push(0);
                     }
                 }
             }
