@@ -477,17 +477,18 @@ public class lab3 {
     public static void b(int inst, String[] tokens, String cmnd) {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        String rt = "";
-        String rs = "";
+        int rt = 0;
+        int rs = 0;
 
         for (Register r : codes) {
             if (r.name.equals(t.get(1))) {
-                rt = r.code;
+                rt = r.val;
             }
             if (r.name.equals(t.get(0))) {
-                rs = r.code;
+                rs = r.val;
             }
         }
+
         int label_pos = 0;
         //search for the label
         for(int i = 0; i < labels.length; i++)
@@ -505,6 +506,27 @@ public class lab3 {
         else
         {
             //System.out.println(rs + " " + rt + " " + String.format("%016d", Integer.parseInt(Integer.toBinaryString((label_pos - inst)))));
+
+        }
+
+        if(cmnd == "beq"){
+            if(rs == rt){
+                for (Register r : codes) {
+                    if (r.name.equals("pc")) {
+                        r.val = r.val + 4 + label_pos;
+                    }
+                }
+            }
+        }
+
+        else if(cmnd == "bne"){
+            if(rs != rt){
+                for (Register r : codes) {
+                    if (r.name.equals("pc")) {
+                        r.val = r.val + 4 + label_pos;     // pc = pc + 4 + branch address
+                    }
+                }
+            }
         }
     }
 
@@ -512,6 +534,7 @@ public class lab3 {
     public static void j(String target, String cmnd)
     {
         int label_pos = 0;
+        int pc_value;
         //search for the label
         for(int i = 0; i < labels.length; i++)
         {
@@ -521,7 +544,24 @@ public class lab3 {
             }
         }
 
-        short a = (short) label_pos;
+        if(cmnd == "j"){
+            for (Register r : codes) {
+                if (r.name.equals("pc")) {
+                    r.val = label_pos;       // pc = jump address
+                }
+            }
+        }
+
+        else if (cmnd == "jal"){
+            for (Register r : codes) {
+                if (r.name.equals("pc")) {
+                    pc_value = r.val;
+                    r.val = label_pos;       // pc = jump address
+                }
+            }
+            codes[31] = pc_value + 4;  // idk what the ref sheet means by R[31] = PC + 4
+        }
+        //short a = (short) label_pos;
         //System.out.println(String.format("%026d", Integer.parseInt(Integer.toBinaryString(a))));
     }
 
@@ -530,11 +570,27 @@ public class lab3 {
     {
         List<String> t = new ArrayList<String>(Arrays.asList(tokens));
         t.removeAll(Arrays.asList("", null));
-        for(Register r: codes)
+        /*for(Register r: codes)
         {
             if(r.name.equals(t.get(0)))
             {
                 //System.out.print(r.code);
+            }
+        }*/
+
+        int rs = 0;
+
+        for (Register r : codes) {
+            if (r.name.equals(t.get(0))) {
+                rs = r.val;
+                break;
+            }
+        }
+
+        for (Register r : codes) {
+            if (r.name.equals("pc")) {
+                r.val = rs;
+                break
             }
         }
     }
