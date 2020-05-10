@@ -110,6 +110,8 @@ public class lab3 {
         }
     }
 
+    public static ArrayList<String> linesToRemove = new ArrayList<>();
+
     // First pass.
     // Looks for a label by finding where colons are, and then puts the label into labels[] at the index of the # instruction it comes after
     public static void findLabels()
@@ -119,11 +121,12 @@ public class lab3 {
         // Goes through each line in the file and breaks it into tokens
         // if the line contains a label, it stores it.
         // if the line contains an instruction, it counts it and goes to the next.
-        for(int i = 0; i < lines.size(); i++) {
+        for(String l : lines) {
             // Contains each part of the line as an array
-            String[] tokens = lines.get(i).split(" |\t|\\$|,");
+            String[] tokens = l.split(" |\t|\\$|,");
             for (int j = 0; j < tokens.length; j++) {
                 if (tokens[j].contains("#")) {
+                    linesToRemove.add(l);
                     break;
                 } else if (tokens[j].equals("and")) {
                     num_inst++;
@@ -172,12 +175,20 @@ public class lab3 {
                 else if(tokens[j].contains(":")) {
                     labels[num_inst] = tokens[j].substring(0, tokens[j].length() - 1);
                 }
+                else if (j == tokens.length - 1)
+                {
+                    linesToRemove.add(l);
+                }
             }
+        }
+        for(String l: linesToRemove)
+        {
+            lines.remove(l);
         }
     }
 
     // Second pass. Prints each inst by calling its appropriate helper function
-    public static void printInstruction()
+    public static void parseInstructions()
     {
         int inst_num = 0;
         // Same setup as with finding labels, except it only finds instructions,
@@ -505,13 +516,14 @@ public class lab3 {
 
     public static void main(String[] args) throws Exception
     {
-        public ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
-
         Scanner scan = new Scanner(System.in);
-
-        String user = "";
+        ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
 
         //readFile(args[0]);
+        readFile("test1.asm");
+        //printMemory();
+        findLabels();
+        //parseInstructions();
         if(args.length > 1)
         {
             //script mode
@@ -531,8 +543,8 @@ public class lab3 {
                 }
             }
 
-            for(int i = 0; i < commands.length; i++){
-                String[] input = commands[i].split(" ");  // command line -> [[command], [num1], [num2], ...)
+            for(int i = 0; i < commands.size(); i++){
+                String[] input = commands.get(i).split(" ");  // command line -> [[command], [num1], [num2], ...)
 
                 if(input[0].equals("q"))
                 {
@@ -557,7 +569,7 @@ public class lab3 {
                     }
                     else{
                         int num = Integer.parseInt(input[1]);
-                        for(int i = 0; i < num; i++){
+                        for(int j = 0; j < num; j++){
                             // single step
                         }
                         System.out.print(String.format("      %d instruction(s) executed\n", num));
@@ -670,9 +682,5 @@ public class lab3 {
                 }
             }
         }
-        //readFile("test1.asm");
-        //printMemory();
-        //findLabels();
-        //printInstruction();
     }
 }
