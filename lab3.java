@@ -13,6 +13,8 @@ public class lab3 {
     private static String[] labels;
     // number of instructions. Used for putting labels into labels[]
     private static int num_inst = 0;
+    // used to keep track of which instruction we're on
+    private static int inst_num = 0;
 
     private static Stack<Integer> memory = new Stack<>();
 
@@ -90,7 +92,6 @@ public class lab3 {
     public static void readFile(String file) throws Exception
     {
         String line;
-        int num_lines = 0;
         File in = new File(file);
         Scanner scan = new Scanner(in);
 
@@ -101,7 +102,6 @@ public class lab3 {
             line = line.replaceAll("#"," #");
             line = line.replaceAll(":",": ");
             lines.add(line);
-            num_lines++;
             try
             {
                 line = scan.nextLine();
@@ -194,161 +194,155 @@ public class lab3 {
         }
     }
 
-    // Second pass. Prints each inst by calling its appropriate helper function
-    public static void parseInstructions()
+    // Runs the next instruction
+    public static void parseInstruction()
     {
-        int inst_num = 0;
-        // Same setup as with finding labels, except it only finds instructions,
-        // and once it does it prints them
-        for(int i = 0; i < lines.size(); i++)
+        // Contains each part of the line as an array
+        String[] tokens = lines.get(inst_num).split(" |\t|\\$|,|:|\\(|\\)");
+        for(int j = 0; j < tokens.length; j++)
         {
-            // Contains each part of the line as an array
-            String[] tokens = lines.get(i).split(" |\t|\\$|,|:|\\(|\\)");
-            for(int j = 0; j < tokens.length; j++)
+            // We don't need to see anything in comments
+            if(tokens[j].contains("#"))
             {
-                // We don't need to see anything in comments
-                if(tokens[j].contains("#"))
+                break;
+            }
+            else if(tokens[j].equals("and"))
+            {
+                inst_num++;
+                //System.out.print("000000 ");
+                // This takes only the arguments of the instruction
+                r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "and");
+                //System.out.println(" 00000 100100");
+            }
+            else if(tokens[j].equals("or"))
+            {
+                inst_num++;
+                //System.out.print("000000 ");
+                r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "or");
+                //System.out.println(" 00000 100101");
+            }
+            else if(tokens[j].equals("add"))
+            {
+                inst_num++;
+                //System.out.print("000000 ");
+                r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "add");
+                //System.out.println(" 00000 100000");
+            }
+            else if(tokens[j].equals("addi"))
+            {
+                inst_num++;
+                //System.out.print("001000 ");
+                addi(Arrays.copyOfRange(tokens, j + 1, tokens.length));
+            }
+            else if(tokens[j].equals("sll"))
+            {
+                inst_num++;
+                //System.out.print("000000 00000 ");
+                sll(Arrays.copyOfRange(tokens, j + 1, tokens.length));
+                //System.out.println(" 000000");
+            }
+            else if(tokens[j].equals("sub"))
+            {
+                inst_num++;
+                //System.out.print("000000 ");
+                r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sub");
+                //System.out.println(" 00000 100010");
+            }
+            else if(tokens[j].equals("slt"))
+            {
+                inst_num++;
+                //System.out.print("000000 ");
+                r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "slt");
+                //System.out.println(" 00000 101010");
+            }
+            else if(tokens[j].equals("beq"))
+            {
+                inst_num++;
+                //System.out.print("000100 ");
+                b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "beq");
+            }
+            else if(tokens[j].equals("bne"))
+            {
+                inst_num++;
+                //System.out.print("000101 ");
+                b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "bne");
+            }
+            else if(tokens[j].equals("lw"))
+            {
+                inst_num++;
+                //System.out.print("100011 ");
+                loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "lw");
+            }
+            else if(tokens[j].equals("sw"))
+            {
+                inst_num++;
+                //System.out.print("101011 ");
+                loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sw");
+            }
+            else if(tokens[j].equals("j"))
+            {
+                inst_num++;
+                //System.out.print("000010 ");
+                j(tokens[j + 1], "j");
+            }
+            else if(tokens[j].equals("jr"))
+            {
+                inst_num++;
+                //System.out.print("000000 ");
+                jr(Arrays.copyOfRange(tokens, j + 1, tokens.length));
+                //System.out.println(" 000000000000000 001000");
+            }
+            else if(tokens[j].equals("jal"))
+            {
+                inst_num++;
+                //System.out.print("000011 ");
+                j(tokens[j + 1], "jal");
+            }
+            // If it is not an instruction, it could possibly be another recognized thing or an invalid instruction.
+            // Error checking.
+            else
+            {
+                boolean valid = false;
+                // It's just whitespace
+                if(tokens[j].equals(""))
                 {
-                    break;
+                    valid = true;
                 }
-                else if(tokens[j].equals("and"))
+                // It's a label
+                for(String s: labels)
                 {
-                    inst_num++;
-                    //System.out.print("000000 ");
-                    // This takes only the arguments of the instruction
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "and");
-                    //System.out.println(" 00000 100100");
-                }
-                else if(tokens[j].equals("or"))
-                {
-                    inst_num++;
-                    //System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "or");
-                    //System.out.println(" 00000 100101");
-                }
-                else if(tokens[j].equals("add"))
-                {
-                    inst_num++;
-                    //System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "add");
-                    //System.out.println(" 00000 100000");
-                }
-                else if(tokens[j].equals("addi"))
-                {
-                    inst_num++;
-                    //System.out.print("001000 ");
-                    addi(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                }
-                else if(tokens[j].equals("sll"))
-                {
-                    inst_num++;
-                    //System.out.print("000000 00000 ");
-                    sll(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    //System.out.println(" 000000");
-                }
-                else if(tokens[j].equals("sub"))
-                {
-                    inst_num++;
-                    //System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sub");
-                    //System.out.println(" 00000 100010");
-                }
-                else if(tokens[j].equals("slt"))
-                {
-                    inst_num++;
-                    //System.out.print("000000 ");
-                    r(Arrays.copyOfRange(tokens, j + 1, tokens.length), "slt");
-                    //System.out.println(" 00000 101010");
-                }
-                else if(tokens[j].equals("beq"))
-                {
-                    inst_num++;
-                    //System.out.print("000100 ");
-                    b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "beq");
-                }
-                else if(tokens[j].equals("bne"))
-                {
-                    inst_num++;
-                    //System.out.print("000101 ");
-                    b(inst_num, Arrays.copyOfRange(tokens, j + 1, tokens.length), "bne");
-                }
-                else if(tokens[j].equals("lw"))
-                {
-                    inst_num++;
-                    //System.out.print("100011 ");
-                    loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "lw");
-                }
-                else if(tokens[j].equals("sw"))
-                {
-                    inst_num++;
-                    //System.out.print("101011 ");
-                    loadStore(Arrays.copyOfRange(tokens, j + 1, tokens.length), "sw");
-                }
-                else if(tokens[j].equals("j"))
-                {
-                    inst_num++;
-                    //System.out.print("000010 ");
-                    j(tokens[j + 1], 'j');
-                }
-                else if(tokens[j].equals("jr"))
-                {
-                    inst_num++;
-                    //System.out.print("000000 ");
-                    jr(Arrays.copyOfRange(tokens, j + 1, tokens.length));
-                    //System.out.println(" 000000000000000 001000");
-                }
-                else if(tokens[j].equals("jal"))
-                {
-                    inst_num++;
-                    //System.out.print("000011 ");
-                    j(tokens[j + 1], "jal");
-                }
-                // If it is not an instruction, it could possibly be another recognized thing or an invalid instruction.
-                // Error checking.
-                else
-                {
-                    boolean valid = false;
-                    // It's just whitespace
-                    if(tokens[j].equals(""))
+                    if(s!= null && s.equals(tokens[j]))
                     {
                         valid = true;
                     }
-                    // It's a label
-                    for(String s: labels)
+                }
+                // It's a register
+                for(Register r: codes)
+                {
+                    if(r.name.equals(tokens[j]))
                     {
-                        if(s!= null && s.equals(tokens[j]))
-                        {
-                            valid = true;
-                        }
-                    }
-                    // It's a register
-                    for(Register r: codes)
-                    {
-                        if(r.name.equals(tokens[j]))
-                        {
-                            valid = true;
-                        }
-                    }
-                    // It's an immediate
-                    for (char c : tokens[j].toCharArray()) {
-                        if (Character.isDigit(c)) {
-                            valid = true;
-                        }
-                    }
-                    // If it is not one of those, it must be an invalid instruction.
-                    if(!valid)
-                    {
-                        System.out.println("invalid instruction: " + tokens[j]);
-                        return;
+                        valid = true;
                     }
                 }
-                //modify the stack if needed
-                if(codes.get(codes.size() - 2).val > memory.size())
-                {
-                    while(memory.size() < codes.get(codes.size() - 2).val)
-                    {
-                        memory.push(0);
+                // It's an immediate
+                for (char c : tokens[j].toCharArray()) {
+                    if (Character.isDigit(c)) {
+                        valid = true;
                     }
+                }
+                // If it is not one of those, it must be an invalid instruction.
+                if(!valid)
+                {
+                    System.out.println("invalid instruction: " + tokens[j]);
+                    return;
+                }
+            }
+            //modify the stack if needed
+            if(codes.get(codes.size() - 2).val > memory.size())
+            {
+                while(memory.size() < codes.get(codes.size() - 2).val)
+                {
+                    memory.push(0);
                 }
             }
         }
@@ -377,27 +371,27 @@ public class lab3 {
             }
         }
         //System.out.print(rs + " " + rt + " " + rd);
-        if(cmnd == "and"){
+        if(cmnd.equals("and")){
             rd = (rs & rt);
         }
 
-        else if(cmnd == "or"){
+        else if(cmnd.equals("or")){
             rd = (rs | rt);
         }
 
-        else if(cmnd == "add"){
+        else if(cmnd.equals("add")){
             rd = (rs + rt);
         }
 
-        else if(cmnd == "sub"){
+        else if(cmnd.equals("sub")){
             rd = (rs - rt);
         }
 
-        else if(cmnd == "slt"){
+        else if(cmnd.equals("slt")){
             if(rs < rt){
-                rd = 1
+                rd = 1;
             }
-            else if (rs >= rt){
+            else{
                 rd = 0;
             }
         }
@@ -630,10 +624,10 @@ public class lab3 {
         ArrayList<String> commands = new ArrayList<>();  // to store commands from script file
 
         //readFile(args[0]);
-        readFile("test2.asm");
+        readFile("test5.asm");
         //printMemory();
         findLabels();
-        //parseInstructions();
+        //parseInstruction();
         if(args.length > 1)
         {
             //script mode
@@ -674,13 +668,16 @@ public class lab3 {
                 else if(input[0].equals("s"))
                 {
                     if(input[1] == null){
-                        // single step
-                        System.out.print("      1 instruction(s) executed\n");
+                        if(inst_num < lines.size())
+                        {
+                            parseInstruction();
+                            System.out.print("      1 instruction(s) executed\n");
+                        }
                     }
                     else{
                         int num = Integer.parseInt(input[1]);
                         for(int j = 0; j < num; j++){
-                            // single step
+                            parseInstruction();
                         }
                         System.out.print(String.format("      %d instruction(s) executed\n", num));
                     }
@@ -746,13 +743,16 @@ public class lab3 {
                 else if(input[0].equals("s"))
                 {
                     if(input.length == 1){
-                        // single step
-                        System.out.print("      1 instruction(s) executed\n");
+                        if(inst_num < lines.size())
+                        {
+                            parseInstruction();
+                            System.out.print("      1 instruction(s) executed\n");
+                        }
                     }
                     else{
                         int num = Integer.parseInt(input[1]);
                         for(int i = 0; i < num; i++){
-                            // single step
+                            parseInstruction();
                         }
                         System.out.print(String.format("      %d instruction(s) executed\n", num));
                     }
